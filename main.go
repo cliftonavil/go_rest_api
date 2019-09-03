@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"net/http"
 
@@ -22,71 +23,15 @@ func main() {
 		panic("failed to connect database")
 	}
 	defer db.Close()
-	router := mux.NewRouter()
-
-	// router.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-	// 	var template = template.Must(template.ParseFiles("index.html"))
-	// 	Activity := []Product{}
-	// 	db.Find(&Activity)
-	// 	template.ExecuteTemplate(w, "index.html", Activity)
-	// })
-
-	// router.HandleFunc("/add/", func(w http.ResponseWriter, r *http.Request) {
-	// 	http.ServeFile(w, r, "add.html")
-	// })
-
-	// router.HandleFunc("/insert/", func(w http.ResponseWriter, r *http.Request) {
-	// 	var template = template.Must(template.ParseFiles("index.html"))
-	// 	if r.Method == "POST" {
-	// 		name := r.FormValue("name")
-	// 		price := r.FormValue("price")
-	// 		unit := r.FormValue("units")
-	// 		fmt.Println(name, price, unit)
-	// 		// Create
-	// 		db.Create(&Product{Code: name, Price: price, Units: unit})
-	// 		Activity := []Product{}
-	// 		db.Find(&Activity)
-	// 		template.ExecuteTemplate(w, "index.html", Activity)
-	// 	} else {
-	// 		http.ServeFile(w, r, "add.html")
-	// 	}
-	// })
-
-	// router.HandleFunc("/delete/{id}/", func(w http.ResponseWriter, r *http.Request) {
-	// 	var template = template.Must(template.ParseFiles("index.html"))
-	// 	vars := mux.Vars(r)
-	// 	id := vars["id"]
-	// 	var product Product
-	// 	db.Where("id = ?", id).Delete(&product)
-
-	// 	Activity := []Product{}
-	// 	db.Find(&Activity)
-	// 	template.ExecuteTemplate(w, "index.html", Activity)
-	// })
-
-	// router.HandleFunc("/edit/{id}/", func(w http.ResponseWriter, r *http.Request) {
-	// 	var template = template.Must(template.ParseFiles("edit.html"))
-	// 	vars := mux.Vars(r)
-	// 	id := vars["id"]
-	// 	Activity := []Product{}
-	// 	db.First(&Activity, id)
-	// 	template.ExecuteTemplate(w, "edit.html", Activity)
-	// })
-	// router.HandleFunc("/update/", func(w http.ResponseWriter, r *http.Request) {
-	// 	var template = template.Must(template.ParseFiles("index.html"))
-	// 	id := r.FormValue("id")
-	// 	name := r.FormValue("name")
-	// 	price := r.FormValue("price")
-	// 	units := r.FormValue("units")
-	// 	var product Product
-	// 	db.First(&product, id).Update(map[string]interface{}{"Price": price, "Code": name, "Units": units})
-	// 	Activity := []Product{}
-	// 	db.Find(&Activity)
-	// 	template.ExecuteTemplate(w, "index.html", Activity)
-	// })
+	router := mux.NewRouter().StrictSlash(true)
+	router.HandleFunc("/", homeLink).Methods("GET")
 
 	servererror := http.ListenAndServe(":8080", router)
 	if servererror != nil {
 		log.Fatal("ListenAndServe:", err)
 	}
+}
+
+func homeLink(w http.ResponseWriter, r *http.Request) {
+	fmt.Fprintf(w, "Welcome home!")
 }
