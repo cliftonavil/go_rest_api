@@ -17,6 +17,7 @@ type User struct {
 	Email string
 }
 
+
 var Database *gorm.DB
 
 func init() {
@@ -46,6 +47,7 @@ func main() {
 	router := mux.NewRouter().StrictSlash(true)
 
 	router.HandleFunc("/users", allUsers).Methods("GET")
+	router.HandleFunc("/user/{id}", oneUser).Methods("GET")
 	router.HandleFunc("/user/{id}", deleteUser).Methods("DELETE")
 	router.HandleFunc("/user/{name}/{email}", updateUser).Methods("PUT")
 	router.HandleFunc("/user/{name}/{email}", newUser).Methods("POST")
@@ -61,10 +63,6 @@ func allUsers(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(users)
 }
 
-func newUser(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintf(w, "New User Endpoint Hit")
-}
-
 func deleteUser(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	id := vars["id"]
@@ -72,6 +70,26 @@ func deleteUser(w http.ResponseWriter, r *http.Request) {
 	var users User
 	Database.Where("id = ?", id).Delete(&users)
 }
+
+func oneUser(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	id := vars["id"]
+	var user []User
+	Database.Where("id = ?", id).First(&user).RecordNotFound()
+	if len(user)> 0{
+		json.NewEncoder(w).Encode(user)
+	}else{
+		data := "NOt FOund!!!"
+		json.NewEncoder(w).Encode(data)
+	}
+	
+}
+
+func newUser(w http.ResponseWriter, r *http.Request) {
+	fmt.Fprintf(w, "New User Endpoint Hit")
+}
+
+
 
 func updateUser(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintf(w, "Update User Endpoint Hit")
