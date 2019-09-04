@@ -17,7 +17,6 @@ type User struct {
 	Email string
 }
 
-
 var Database *gorm.DB
 
 func init() {
@@ -49,7 +48,7 @@ func main() {
 	router.HandleFunc("/users", allUsers).Methods("GET")
 	router.HandleFunc("/user/{id}", oneUser).Methods("GET")
 	router.HandleFunc("/user/{id}", deleteUser).Methods("DELETE")
-	router.HandleFunc("/user/{name}/{email}", updateUser).Methods("PUT")
+	router.HandleFunc("/user/{id}", updateUser).Methods("PUT")
 	router.HandleFunc("/user/", newUser).Methods("POST")
 
 	log.Fatal(http.ListenAndServe(":8080", router))
@@ -75,13 +74,13 @@ func oneUser(w http.ResponseWriter, r *http.Request) {
 	id := vars["id"]
 	var user []User
 	Database.Where("id = ?", id).First(&user).RecordNotFound()
-	if len(user)> 0{
+	if len(user) > 0 {
 		json.NewEncoder(w).Encode(user)
-	}else{
+	} else {
 		data := "NOt FOund!!!"
 		json.NewEncoder(w).Encode(data)
 	}
-	
+
 }
 
 func newUser(w http.ResponseWriter, r *http.Request) {
@@ -92,8 +91,11 @@ func newUser(w http.ResponseWriter, r *http.Request) {
 	Database.Create(&User{Name: name, Email: email})
 }
 
-
-
 func updateUser(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintf(w, "Update User Endpoint Hit")
+	id := r.FormValue("id")
+	name := r.FormValue("name")
+	email := r.FormValue("email")
+	var user User
+	Database.Debug().First(&user, id).Update(map[string]interface{}{"Name": name, "Email": email})
+	fmt.Printf("completee!!")
 }
