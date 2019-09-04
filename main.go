@@ -48,7 +48,7 @@ func main() {
 	router.HandleFunc("/users", allUsers).Methods("GET")
 	router.HandleFunc("/user/{id}", oneUser).Methods("GET")
 	router.HandleFunc("/user/{id}", deleteUser).Methods("DELETE")
-	router.HandleFunc("/user/{id}", updateUser).Methods("PUT")
+	router.HandleFunc("/update_user/{id}", updateUser)
 	router.HandleFunc("/user/", newUser).Methods("POST")
 
 	log.Fatal(http.ListenAndServe(":8080", router))
@@ -92,10 +92,12 @@ func newUser(w http.ResponseWriter, r *http.Request) {
 }
 
 func updateUser(w http.ResponseWriter, r *http.Request) {
-	id := r.FormValue("id")
+	vars := mux.Vars(r)
+	id := vars["id"]
 	name := r.FormValue("name")
 	email := r.FormValue("email")
 	var user User
 	Database.Debug().First(&user, id).Update(map[string]interface{}{"Name": name, "Email": email})
 	fmt.Printf("completee!!")
+
 }
