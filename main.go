@@ -50,7 +50,7 @@ func main() {
 	router.HandleFunc("/user/{id}", oneUser).Methods("GET")
 	router.HandleFunc("/user/{id}", deleteUser).Methods("DELETE")
 	router.HandleFunc("/user/{name}/{email}", updateUser).Methods("PUT")
-	router.HandleFunc("/user/{name}/{email}", newUser).Methods("POST")
+	router.HandleFunc("/user/", newUser).Methods("POST")
 
 	log.Fatal(http.ListenAndServe(":8080", router))
 }
@@ -59,7 +59,6 @@ func allUsers(w http.ResponseWriter, r *http.Request) {
 	var users []User
 	Database.Find(&users)
 	fmt.Println("{}", users)
-
 	json.NewEncoder(w).Encode(users)
 }
 
@@ -86,7 +85,11 @@ func oneUser(w http.ResponseWriter, r *http.Request) {
 }
 
 func newUser(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintf(w, "New User Endpoint Hit")
+	name := r.FormValue("name")
+	email := r.FormValue("email")
+	fmt.Println(name, email)
+	// Create
+	Database.Create(&User{Name: name, Email: email})
 }
 
 
